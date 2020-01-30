@@ -4,9 +4,11 @@
  * Created: 17/01/2020 05:27:05 pm
  *  Author: mo
  */
+#include "timers.h"
  #include "pushButton.h"
  #include "pushButtonConfig.h"
  #include "led.h"
+ #include "SwICU.h"
 /*
 #define BTN_0_GPIO	GPIOC
 #define BTN_0_BIT	BIT4
@@ -24,6 +26,7 @@ BTN_0,
 	BTN_2,
 	BTN_3
 */
+extern uint8_t volatile status_Flag;
 void pushButtonInit(En_buttonId_t en_butotn_id)
 {
 
@@ -109,8 +112,16 @@ break;
 }
 
 void check_button(void)
-{		Led_On(LED_0);
-		//Led_On(LED_3);
-		//softwareDelayMs(1000);
-		//Led_Off(LED_3);
+{//	Led_Toggle(LED_0);
+	MCUCSR ^= (1<<6);
+	if(((MCUCSR>>6)&1))
+	{
+		timer0Start();
+	}
+	else
+	{
+		timer0Stop();
+	}
+
+
 }

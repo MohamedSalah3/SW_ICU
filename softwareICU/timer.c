@@ -4,10 +4,12 @@
 #include "timers.h"
 #include "registers.h"
 #include "Interrupts.h"
+uint8_t volatile status_Flag=1;
 uint8_t Prescaler_Value=0;
 uint8_t pooling=0;
 uint8_t Prescaler_Value2=0;
 volatile uint8_t pwm_time_on=0,flag=0;
+volatile uint8_t u8_ovf_counter=0;
 void timer0Init(En_timer0Mode_t en_mode,En_timer0OC_t en_OC0,En_timer0perscaler_t en_prescal,uint8_t u8_initialValue, uint8_t u8_outputCompare,En_timer0Interrupt_t en_interruptMask)
 {
 if(en_prescal == T0_NO_CLOCK)
@@ -18,7 +20,7 @@ timer0Stop();
 }
 else
 {
-TCCR0 |= en_mode|en_prescal ;
+TCCR0 |= en_mode|en_prescal;
 Prescaler_Value=en_prescal;
 TCNT0 = u8_initialValue;
 switch(en_OC0){
@@ -131,7 +133,7 @@ for (u32_loop=0;u32_loop<u16_delay_in_ms;u32_loop++)
  */
  void timer0DelayUs(uint32_t u32_delay_in_us)
  {  uint32_t u32_loop=0;
-	u32_ovf_counter=0;
+	u8_ovf_counter=0;
 	for (u32_loop=0;u32_loop<u32_delay_in_us;u32_loop++)
 	{
 	timer0Set(240);
@@ -155,14 +157,14 @@ switch(pooling)
 	//freq 50KHZ is the Max frequency possible
 	while ((TIFR&0x01)==0);
 	TIFR |=0x01;
-	PORTB_DATA^=0xff;
+	PORTC_DATA |=0xff;
 	timer0Start();
 	timer0Set(MAX_HOLD-pwm_time_on);
 	//freq
 	while ((TIFR & 0x01)==0);
 	TIFR |=0x01;
-	PORTB_DATA^=0xff;
-    
+	PORTC_DATA &=0x00;
+
 break;
 }
 case 1:
@@ -175,14 +177,39 @@ break;
 }
 
 }
-void Timer_interrupt_routine(void)
+
+void timer0MakePulse(void)
 {
-	PORTB_DATA ^=0xff;
+timer0Init(T0_NORMAL_MODE,T0_OC0_DIS,T0_PRESCALER_NO,0,0,T0_POLLING);
+/*timer0Start();
+timer0Set(0);
+for(uint8_t counter =0;counter<5;counter++){
+while ((TIFR&0x01)==0);
+TIFR |=0x01;
+}
+timer0Stop();
+PORTD_DATA^=0xff;
+*/
+timer0SwPWM(80,0);//triger
+timer0Init(T0_NORMAL_MODE,T0_OC0_DIS,T0_PRESCALER_NO,0,0,T0_INTERRUPT_NORMAL);
+
+}
+
+
+
+void Timer_interrupt_routine(void)
+{/*
+	Led_Toggle(LED_3);
+	timer0Stop();
+*/
+u8_ovf_counter +=1;
+//timer0Read();
+//flag =1;
 }
 
 void Timer_interrupt_COMP_routine(void)
 {
-	PORTB_DATA ^=0xff;
+	PORTD_DATA ^=0xff;
 
 }
 /*
@@ -230,9 +257,11 @@ G_interrupt_Enable();
  }
 
 
-/*
- * Description:
- * @param value
+
+
+
+
+
  */
 void timer1Set(uint16_t u16_value)
 {
@@ -401,7 +430,7 @@ TCCR2 &= 0xf8;
 * @param delay
 */
 void timer2DelayMs(uint16_t u16_delay_in_ms)
-{	
+{
 while(u16_delay_in_ms > 0)
 {
 while ((TIFR & 0x40)==0);

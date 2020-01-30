@@ -10,10 +10,10 @@
 
 #include "registers.h"
 #include "gpio.h"
-extern uint8_t Prescaler_Value;
+//extern uint8_t Prescaler_Value;
 extern uint8_t pooling;
-/*
- * User Configuration Macros
+//extern uint8_t volatile status_Flag;
+/* User Configuration Macros
  */
 #define MAX_HOLD 255
 #define FULL_SPEED 100
@@ -151,7 +151,7 @@ void timer0SwPWM(uint8_t u8_dutyCycle,uint8_t u8_frequency);
 
 
 
-
+void timer0MakePulse(void);
 
 
 

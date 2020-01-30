@@ -37,6 +37,7 @@ extern ptr_to_Fun TWI_I2C;
 extern ptr_to_Fun SPM_RDY;
 extern void G_interrupt_Enable(void);
 extern void G_interrupt_Disable(void);
-extern volatile uint32_t u32_ovf_counter;
+extern void EX_interrupt_enable2(void);
+extern volatile uint8_t u8_ovf_counter;
 #define INT2 5
 #endif /* INTERRUPTS_H_ */

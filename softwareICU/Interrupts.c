@@ -5,7 +5,9 @@
  *  Author: mo
  */
 //#include "pushButton.h"
+#include "gpio.h"
 #include "timers.h"
+#include "pushButton.h"
 #include "Interrupts.h"
 ptr_to_Fun INT0_external_interrupt;
 ptr_to_Fun INT1_external_interrupt;
@@ -35,13 +37,12 @@ void G_interrupt_Enable(void)
 }
 void EX_interrupt_enable2(void)
 {
-
+gpioPinDirection(GPIOB,BIT2,LOW);
 SET_BIT(GICR,INT2);
 SET_BIT(MCUCSR,6);
 }
 void G_interrupt_Disable(void)
 {
-
 CLEAR_BIT(SREG,7);
 }
 void __vector_1(void) __attribute__((signal,__INTR_ATTRS));

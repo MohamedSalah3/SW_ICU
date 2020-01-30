@@ -3,16 +3,31 @@
  *
  * Created: 29/01/2020 01:51:19 م
  *  Author: mo
- */ 
-
-
-#include <avr/io.h>
-
+ */
+#include "registers.h"
+#include "SwICU.h"
+#include "Interrupts.h"
+#include "timers.h"
+#include "led.h"
+#include "ledConfig.h"
+#include "util/delay.h"
 int main(void)
-{
-	SwICU_Init();
-    while(1)
+{volatile uint16_t x,y;
+	gpioPortDirection(GPIOB,HIGH);
+	gpioPortDirection(GPIOC,HIGH);
+
+//	gpioPortWrite(GPIOB,LOW);
+	SwICU_Init(SwICU_EdgeRisiging);
+	 
+	while(1)
     {
-        //TODO:: Please write your application code 
-    }
+//timer0MakePulse();
+PORTC_DATA |=0xff;
+_delay_ms(1);
+PORTC_DATA &=0x00;
+//_delay_ms(1);
+SwICU_Start();
+SwICU_Read(&u8_ovf_counter);
+SwICU_Stop();
+	}
 }

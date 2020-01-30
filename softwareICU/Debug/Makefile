@@ -39,6 +39,7 @@ C_SRCS +=  \
 ../Interrupts.c \
 ../led.c \
 ../pushButton.c \
+../softwareDelay.c \
 ../softwareICU.c \
 ../SWICU.c \
 ../timer.c
@@ -55,6 +56,7 @@ gpio.o \
 Interrupts.o \
 led.o \
 pushButton.o \
+softwareDelay.o \
 softwareICU.o \
 SWICU.o \
 timer.o
@@ -65,6 +67,7 @@ gpio.o \
 Interrupts.o \
 led.o \
 pushButton.o \
+softwareDelay.o \
 softwareICU.o \
 SWICU.o \
 timer.o
@@ -75,6 +78,7 @@ gpio.d \
 Interrupts.d \
 led.d \
 pushButton.d \
+softwareDelay.d \
 softwareICU.d \
 SWICU.d \
 timer.d
@@ -85,6 +89,7 @@ gpio.d \
 Interrupts.d \
 led.d \
 pushButton.d \
+softwareDelay.d \
 softwareICU.d \
 SWICU.d \
 timer.d
@@ -99,6 +104,8 @@ ADDITIONAL_DEPENDENCIES:=
 OUTPUT_FILE_DEP:= ./makedep.mk
 
 # AVR32/GNU C Compiler
+
+
 
 
 
