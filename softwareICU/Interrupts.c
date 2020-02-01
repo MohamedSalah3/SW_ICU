@@ -5,14 +5,14 @@
  * Created: 21/01/2020 01:18:13 م
  *  Author: mo
  */
-//#include "pushButton.h"
+#include "pushButton.h"
 #include "gpio.h"
 #include "timers.h"
 #include "pushButton.h"
 #include "Interrupts.h"
 ptr_to_Fun INT0_external_interrupt;
 ptr_to_Fun INT1_external_interrupt;
-ptr_to_Fun INT2_external_interrupt;//=check_button;
+ptr_to_Fun INT2_external_interrupt=check_button;
 ptr_to_Fun TIMER2COMP=Timer2_interrupt_COMP_routine;
 ptr_to_Fun TIMER2OVF=Timer2_interrupt_routine;
 ptr_to_Fun TIMER1CAPT;

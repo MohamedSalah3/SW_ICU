@@ -116,7 +116,7 @@ void check_button(void)
 
 	if(((MCUCSR>>6)&1))
 	{//reversed
-		SwICU_Start();	
+		SwICU_Start();
 	}
 	else
 	{
