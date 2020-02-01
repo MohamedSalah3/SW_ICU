@@ -181,15 +181,6 @@ break;
 void timer0MakePulse(void)
 {
 timer0Init(T0_NORMAL_MODE,T0_OC0_DIS,T0_PRESCALER_NO,0,0,T0_POLLING);
-/*timer0Start();
-timer0Set(0);
-for(uint8_t counter =0;counter<5;counter++){
-while ((TIFR&0x01)==0);
-TIFR |=0x01;
-}
-timer0Stop();
-PORTD_DATA^=0xff;
-*/
 timer0SwPWM(80,0);//triger
 timer0Init(T0_NORMAL_MODE,T0_OC0_DIS,T0_PRESCALER_NO,0,0,T0_INTERRUPT_NORMAL);
 
@@ -202,9 +193,9 @@ void Timer_interrupt_routine(void)
 	Led_Toggle(LED_3);
 	timer0Stop();
 */
-u8_ovf_counter +=1;
+u8_ovf_counter++;
 //timer0Read();
-//flag =1;
+//flag +=1;
 }
 
 void Timer_interrupt_COMP_routine(void)

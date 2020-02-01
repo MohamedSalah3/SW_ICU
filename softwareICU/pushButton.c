@@ -113,15 +113,14 @@ break;
 
 void check_button(void)
 {//	Led_Toggle(LED_0);
-	MCUCSR ^= (1<<6);
+
 	if(((MCUCSR>>6)&1))
-	{
-		timer0Start();
+	{//reversed
+		SwICU_Start();	
 	}
 	else
 	{
-		timer0Stop();
+	SwICU_Stop();
 	}
-
-
+MCUCSR ^= (1<<6);
 }

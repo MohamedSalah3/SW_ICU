@@ -7,6 +7,6 @@
  * 				don't use it with RTOSs
  * @param a_delay_in_ms: the milli-seconds
  */
-void softwareDelayMs(uint32_t u32_delay_in_ms);
+void softwareDelayMs(volatile uint32_t u32_delay_in_ms);
 
 #endif /* SOFTWAREDELAY_H_ */
