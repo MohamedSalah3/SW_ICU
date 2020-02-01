@@ -12,12 +12,15 @@
 #include "gpio.h"
 //extern uint8_t Prescaler_Value;
 extern uint8_t pooling;
+extern uint8_t pooling_2;
 //extern uint8_t volatile status_Flag;
 /* User Configuration Macros
  */
 #define MAX_HOLD 255
 #define FULL_SPEED 100
 extern void Timer_interrupt_COMP_routine(void);
+extern void Timer2_interrupt_routine(void);
+extern void Timer2_interrupt_COMP_routine(void);
 #define T0_PWM_GPIO	GPIOD
 #define T0_PWM_BIT	BIT0
 
@@ -49,7 +52,7 @@ typedef enum En_timer0perscaler_t{
 }En_timer0perscaler_t;
 
 typedef enum En_timer0Interrupt_t{
-	T0_POLLING=0,T0_INTERRUPT_NORMAL=0x01,T0_INTERRUPT_CMP=0x02, T0_All_Interrupts=0x03
+	T0_POLLING=0,T0_INTERRUPT_NORMAL=0x01,T0_INTERRUPT_CMP=0x02,
 }En_timer0Interrupt_t;
 
 
@@ -93,7 +96,8 @@ typedef enum En_timer2OC_t{
 }En_timer2OC_t;
 
 typedef enum En_timer2perscaler_t{
-	T2_NO_CLOCK=0,T2_PRESCALER_NO=0x01,T2_PRESCALER_8=0x02, T2_PRESCALER_32=0x03, T2_PRESCALER_64=0x04, T2_PRESCALER_128=0x05, T2_PRESCALER_256 = 0x06, T2_PRESCALER_1024=0x07
+	T2_NO_CLOCK=0,T2_PRESCALER_NO=0x01,T2_PRESCALER_8=0x02, T2_PRESCALER_32=0x03,
+	 T2_PRESCALER_64=0x04, T2_PRESCALER_128=0x05, T2_PRESCALER_256 = 0x06, T2_PRESCALER_1024=0x07
 }En_timer2perscaler_t;
 
 	typedef enum En_timer2Interrupt_t{

@@ -7,6 +7,7 @@
 uint8_t volatile status_Flag=1;
 uint8_t Prescaler_Value=0;
 uint8_t pooling=0;
+uint8_t pooling_2=0;
 uint8_t Prescaler_Value2=0;
 uint8_t u8g_T1_Prescaler=0;
 volatile uint8_t pwm_time_on=0,flag=0;
@@ -225,10 +226,10 @@ void timer1Init(En_timer1Mode_t en_mode,En_timer1OC_t en_OC,
 		case T1_POLLING:
 		{
 			TIMSK &=0xC3;
-			
-			/*	     OCIE0 ToIE0   ALL INTERRUPT T1    	OCIE0 ToIE0		
+
+			/*	     OCIE0 ToIE0   ALL INTERRUPT T1    	OCIE0 ToIE0
 			TIMSK &=  1     1        0 0 0 0 	           1     1
-			All T1 Interrupts enable are cleared 
+			All T1 Interrupts enable are cleared
 			but other timers interrupt enable are not effected
 			*/
 		break;
@@ -259,18 +260,15 @@ void timer1Init(En_timer1Mode_t en_mode,En_timer1OC_t en_OC,
 		/*Enables all interrupst for Timer1*/
 		break;
 		}
-	
-	}
-	
-	
-	
-	
-	}
-		
+
 	}
 
 
- }
+
+
+	}
+
+
 void timer1Set(uint16_t u16_value)
 {
 TCNT1=u16_value;
@@ -300,10 +298,8 @@ TCCR1|=u8g_T1_Prescaler;
  */
 void timer1Stop(void)
 {
-
 TCCR1 &=0xfff8;
 /*Keep all sittings as it is and put zeros in cs10,cs11,cs12*/
-
 }
 
 /**
@@ -336,9 +332,9 @@ void timer1SwPWM(uint8_t u8_dutyCycle,uint8_t u8_frequency)
 
 }
 
-void timer2Init(En_timer2Mode_t en_mode,En_timer2OC_t en_OC,En_timer2perscaler_t en_prescal, uint8_t u8_initialValue, uint8_t u8_outputCompare, uint8_t u8_assynchronous, En_timer2Interrupt_t en_interruptMask)
+void timer2Init(En_timer2Mode_t en_mode,En_timer2OC_t en_OC,En_timer2perscaler_t en_prescal2, uint8_t u8_initialValue, uint8_t u8_outputCompare, uint8_t u8_assynchronous, En_timer2Interrupt_t en_interruptMask)
 {
-if(en_prescal == T0_NO_CLOCK)
+if(en_prescal2 == T2_NO_CLOCK)
 {/*
 if there is no clock the timer will be disabled
 */
@@ -346,8 +342,8 @@ timer2Stop();
 }
 else
 {
-TCCR2 |= en_mode|en_prescal ;
-Prescaler_Value2=en_prescal;
+TCCR2 |= en_mode|en_prescal2 ;
+Prescaler_Value2=en_prescal2;
 TCNT2 = u8_initialValue;
 switch(en_OC){
 	case  T2_OC2_DIS:
@@ -376,17 +372,20 @@ switch(en_OC){
 OCR2  =u8_outputCompare;
 switch(en_interruptMask){
 case  T2_POLLING:
+pooling_2=0;
 G_interrupt_Disable();
 TIMSK &= T2_POLLING;
 break;
 case T2_INTERRUPT_NORMAL :
 {
+	pooling_2=1;
 G_interrupt_Enable();
 TIMSK |= T2_INTERRUPT_NORMAL;
 break;
 }
 case T2_INTERRUPT_CMP:
 {
+	pooling_2=1;
 G_interrupt_Enable();
 //SET_BIT(SREG,7);
 TIMSK |=T2_INTERRUPT_NORMAL;
@@ -436,26 +435,76 @@ TCCR2 &= 0xf8;
 }
 
 /**
-* Description:
+* Description:pooline No interrupt
 * @param delay
-*/
+*	switch(Prescaler_Value2)
+		{
+		case no:
+		Prescalercounst=58;
+		break;
+		case 8:
+		Prescalercounst=8;
+		break;
+		case 32:
+		Prescalercounst=2;
+		break;
+		case 64:
+		Prescalercounst=1;
+		break;
+		case 128:
+		Prescalercounst=1;
+		break;
+		case 256:
+		Prescalercounst=1;
+		break;
+		case 256:
+		Prescalercounst=1;
+		break;
+
+		}*/
 void timer2DelayMs(uint16_t u16_delay_in_ms)
 {
-while(u16_delay_in_ms > 0)
-{
-while ((TIFR & 0x40)==0);
-TIFR |=0x40;
-u16_delay_in_ms--;
+	volatile uint16_t count =0;
+	volatile uint8_t Prescalercounst=1;
+	switch(Prescaler_Value2)
+	{
+		case T2_PRESCALER_NO:
+		Prescalercounst=58;
+		break;
+		case T2_PRESCALER_8:
+		Prescalercounst=8;
+		break;
+		case T2_PRESCALER_32:
+		Prescalercounst=2;
+		break;
+		case T2_PRESCALER_64:
+		Prescalercounst=1;
+		break;
+		default:
+		Prescalercounst=1;
+		break;
+	}
+	for (count=0;count<(u16_delay_in_ms*Prescalercounst);count++)
+	{
+		timer2Set(240);//10 for no prescaler....12 for 8 prescaler .... 8 for 32 prescaler ....6 for prescaler 64 .....
+		//131 for 128 prescaler.......194 for 256 prescaler....240 for 1024
+		while ((TIFR & 0x40)==0);
+		TIFR |=0x40;
+
+	}
 }
 
-}
-
-/*
-* user defined
-*/
+/*Always No prescaler...pooling ...timer2Set(240)*/
 void timer2DelayUs(uint32_t u16_delay_in_us)
 {
+	volatile uint16_t count =0;
+	for (count=0;count<u16_delay_in_us;count++)
+	{
+		timer2Set(254);//254 for no prescaler
+		while ((TIFR & 0x40)==0);
+		TIFR |=0x40;
 
+	}
 
 }
 
@@ -464,6 +513,51 @@ void timer2DelayUs(uint32_t u16_delay_in_us)
 * @param dutyCycle
 */
 void timer2SwPWM(uint8_t u8_dutyCycle,uint8_t u8_frequency)
+{
+
+float dutyReal;
+pwm_time_on=MAX_HOLD;
+dutyReal=((float)u8_dutyCycle/(float)FULL_SPEED);
+pwm_time_on=(float)pwm_time_on*dutyReal;
+switch(pooling_2)
+{
+	case 0:
+	{
+		timer2Start();
+		timer2Set(pwm_time_on);
+		//freq 50KHZ is the Max frequency possible
+		while ((TIFR&0x04)==0);
+		TIFR |=0x04;
+		PORTC_DATA |=0xff;
+		timer2Start();
+		timer2Set(MAX_HOLD-pwm_time_on);
+		//freq
+		while ((TIFR & 0x04)==0);
+		TIFR |=0x04;
+		PORTC_DATA &=0x00;
+
+		break;
+	}
+	case 1:
+	{
+		timer2Start();
+		OCR2=pwm_time_on;
+		break;
+	}
+
+}
+
+
+}
+
+
+void Timer2_interrupt_COMP_routine(void)
+{
+
+
+
+}
+void Timer2_interrupt_routine(void)
 {
 
 
