@@ -464,29 +464,42 @@ TCCR2 &= 0xf8;
 		}*/
 void timer2DelayMs(uint16_t u16_delay_in_ms)
 {
-	volatile uint16_t count =0;
-	volatile uint8_t Prescalercounst=1;
+	volatile uint16_t count=0;
+	volatile uint8_t Prescalercounst=0,set_timer2=0;
 	switch(Prescaler_Value2)
 	{
-		case T2_PRESCALER_NO:
+		case T2_PRESCALER_NO:{
 		Prescalercounst=58;
-		break;
+		set_timer2=10;
+		break;}
 		case T2_PRESCALER_8:
-		Prescalercounst=8;
-		break;
+		{Prescalercounst=8;
+		set_timer2=12;
+		break;}
 		case T2_PRESCALER_32:
-		Prescalercounst=2;
-		break;
+		{Prescalercounst=2;
+		set_timer2=8;
+		break;}
 		case T2_PRESCALER_64:
-		Prescalercounst=1;
-		break;
-		default:
-		Prescalercounst=1;
-		break;
+		{Prescalercounst=1;
+		set_timer2=6;
+		break;}
+		case T2_PRESCALER_128:
+		{Prescalercounst=1;
+		set_timer2=131;
+		break;}
+		case T2_PRESCALER_256:
+		{Prescalercounst=1;
+		set_timer2=194;
+		break;}
+		case T2_PRESCALER_1024:
+		{Prescalercounst=1;
+		set_timer2=240;
+		break;}
 	}
 	for (count=0;count<(u16_delay_in_ms*Prescalercounst);count++)
 	{
-		timer2Set(240);//10 for no prescaler....12 for 8 prescaler .... 8 for 32 prescaler ....6 for prescaler 64 .....
+		timer2Set(set_timer2);//10 for no prescaler....12 for 8 prescaler .... 8 for 32 prescaler ....6 for prescaler 64 .....
 		//131 for 128 prescaler.......194 for 256 prescaler....240 for 1024
 		while ((TIFR & 0x40)==0);
 		TIFR |=0x40;
