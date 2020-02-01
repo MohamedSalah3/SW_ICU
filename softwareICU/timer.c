@@ -8,6 +8,7 @@ uint8_t volatile status_Flag=1;
 uint8_t Prescaler_Value=0;
 uint8_t pooling=0;
 uint8_t Prescaler_Value2=0;
+uint8_t u8g_T1_Prescaler=0;
 volatile uint8_t pwm_time_on=0,flag=0;
 volatile uint8_t u8_ovf_counter=0;
 void timer0Init(En_timer0Mode_t en_mode,En_timer0OC_t en_OC0,En_timer0perscaler_t en_prescal,uint8_t u8_initialValue, uint8_t u8_outputCompare,En_timer0Interrupt_t en_interruptMask)
@@ -203,57 +204,73 @@ void Timer_interrupt_COMP_routine(void)
 	PORTD_DATA ^=0xff;
 
 }
+
+
 /*
-void timer1Init(En_timer1Mode_t en_mode,En_timer1OC_t en_OC,En_timer1perscaler_t en_prescal,
- uint16_t u16_initialValue, uint16_t u16_outputCompareA,uint16_t u16_outputCompareB,uint16_t u16_inputCapture,En_timer1Interrupt_t en_interruptMask)
+ * Description:
+ * @param:
+ */
+void timer1Init(En_timer1Mode_t en_mode,En_timer1OC_t en_OC,
+	En_timer1perscaler_t en_prescal,uint16_t u16_initialValue,
+	uint16_t u16_outputCompareA,uint16_t u16_outputCompareB,
+	 uint16_t u16_inputCapture,En_timer1Interrupt_t en_interruptMask)
  {
-TCCR1 =en_mode|en_OC|en_prescal;
-TCNT1=u16_initialValue;
-OCR1A=u16_outputCompareA;
-OCR1B=u16_outputCompareB;
-switch (en_interruptMask) {
-	case T1_POLLING:
+	TCCR1 |= en_mode | en_OC;
+	u8g_T1_Prescaler=en_prescal;
+	OCR1A =u16_outputCompareA;
+	OCR1B =u16_outputCompareB;
+	TCNT1=u16_initialValue;
+	switch(en_interruptMask)
 	{
-	G_interrupt_Disable();
-	break;
-	}
-	case T1_INTERRUPT_NORMAL :
-	{
-	G_interrupt_Enable();
-
-
-	break;
-	}
-	case T1_INTERRUPT_CMP_1B:
-	{
-	G_interrupt_Enable();
-
-
-	break;
-	}
-	case T1_INTERRUPT_CMP_1A :
-	{
-G_interrupt_Enable();
+		case T1_POLLING:
+		{
+			TIMSK &=0xC3;
+			
+			/*	     OCIE0 ToIE0   ALL INTERRUPT T1    	OCIE0 ToIE0		
+			TIMSK &=  1     1        0 0 0 0 	           1     1
+			All T1 Interrupts enable are cleared 
+			but other timers interrupt enable are not effected
+			*/
 		break;
-	}
-	case T1_INTERRUPT_ICAPTURE:
-	{
-		G_interrupt_Enable();
+		}
+		case T1_INTERRUPT_NORMAL:
+		{
+			TIMSK |=T1_INTERRUPT_NORMAL;
 		break;
+		}
+		case T1_INTERRUPT_CMP_1A:
+		{
+			TIMSK |=T1_INTERRUPT_CMP_1A;
+			break;
+		}
+		case T1_INTERRUPT_CMP_1B:
+		{
+			TIMSK |=T1_INTERRUPT_CMP_1B;
+			break;
+		}
+		case T1_INTERRUPT_ICAPTURE:
+		{
+			TIMSK |=T1_INTERRUPT_ICAPTURE;
+			break;
+		}
+		case T1_INTERRUPT_All:
+		{
+			TIMSK|=T1_INTERRUPT_All;
+		/*Enables all interrupst for Timer1*/
+		break;
+		}
+	
 	}
-
-}
+	
+	
+	
+	
+	}
+		
+	}
 
 
  }
-
-
-
-
-
-
-
- */
 void timer1Set(uint16_t u16_value)
 {
 TCNT1=u16_value;
@@ -261,7 +278,7 @@ TCNT1=u16_value;
 
 /**
  * Description:
- * @return
+ * @return TCNT1
  */
 uint16_t timer1Read(void)
 {
@@ -270,21 +287,22 @@ return TCNT1;
 
 /**
  * Description:
+ * @param
  */
 void timer1Start(void)
 {
-
-
-
+TCCR1|=u8g_T1_Prescaler;
 }
 
 /**
  * Description:
+ * @param
  */
 void timer1Stop(void)
 {
 
-
+TCCR1 &=0xfff8;
+/*Keep all sittings as it is and put zeros in cs10,cs11,cs12*/
 
 }
 
@@ -299,6 +317,7 @@ void timer1DelayMs(uint16_t u16_delay_in_ms)
 }
 
 /*
+ * Description:
  * user defined
  */
 void timer1DelayUs(uint32_t u32_delay_in_us)

@@ -61,7 +61,7 @@
 
 #define TCCR1A				*((reg_type8_t)(0X4F))	
 #define TCCR1B				*((reg_type8_t)(0X4E))	
-#define TCCR1				*((reg_type8_t)())	//?????????
+#define TCCR1				*((reg_type16_t)(0x4E))	
 
 #define TCNT1H				*((reg_type8_t)(0X4D))	
 #define TCNT1L				*((reg_type8_t)(0X4C))	

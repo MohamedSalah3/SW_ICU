@@ -1,4 +1,5 @@
-﻿/* softwareICU.c
+﻿/*
+ * softwareICU.c
  * Created: 29/01/2020 01:51:19 م
  *  Author: mo
  */
@@ -9,7 +10,6 @@
 #include "led.h"
 #include "ledConfig.h"
 #include "util/delay.h"
-
 uint8_t tcnt0_value=0;
 int main(void)
 {
@@ -27,5 +27,4 @@ int main(void)
 		CLEAR_BIT(PORTC_DATA,1);
 		SwICU_Read(&tcnt0_value);
     }
-
 }
