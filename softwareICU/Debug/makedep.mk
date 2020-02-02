@@ -10,8 +10,6 @@ led.c
 
 pushButton.c
 
-softwareDelay.c
-
 softwareICU.c
 
 SWICU.c

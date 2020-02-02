@@ -9,6 +9,7 @@
  #include "pushButtonConfig.h"
  #include "led.h"
  #include "SwICU.h"
+extern uint8_t icu_started;
 /*
 #define BTN_0_GPIO	GPIOC
 #define BTN_0_BIT	BIT4
@@ -113,14 +114,17 @@ break;
 
 void check_button(void)
 {//	Led_Toggle(LED_0);
-
+  if(icu_started==1){
 	if(((MCUCSR>>6)&1))
 	{//reversed
 		SwICU_Start();
+		MCUCSR ^= (1<<6);
 	}
 	else
 	{
-	SwICU_Stop();
+		icu_started=0;
+		SwICU_Stop();
+		MCUCSR ^= (1<<6);
 	}
-MCUCSR ^= (1<<6);
+}
 }

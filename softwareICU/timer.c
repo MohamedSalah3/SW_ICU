@@ -196,6 +196,9 @@ void Timer_interrupt_routine(void)
 	timer0Stop();
 */
 u8_ovf_counter++;
+
+
+
 //timer0Read();
 //flag +=1;
 }
