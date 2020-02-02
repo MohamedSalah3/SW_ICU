@@ -9,7 +9,9 @@
 #include "timers.h"
 #include "registers.h"
 #define RESOLUTION 256
-
+#define PRESCALER 1
+#define CPU 16000000
+#define TIME_TAKEN_FOR_1_CM 0.000058
 void SwICU_Init(EN_SwICU_Edge_t a_en_inputCaptureEdge)
 {
 /*Make External interrup work first via Any logical change*/
@@ -25,13 +27,16 @@ void SwICU_SetCfgEdge(EN_SwICU_Edge_t a_en_inputCaptureEdgeedge)
 {
 	switch (a_en_inputCaptureEdgeedge) {
 		case SwICU_EdgeFalling :
-	{
-		CLEAR_BIT(MCUCSR,6);
+	{		SwICU_Stop();
+		
+		SET_BIT(MCUCSR,6);
 		break;
 	}
 	case SwICU_EdgeRisiging:
-	{
-	SET_BIT(MCUCSR,6);
+	{SwICU_Start();
+
+
+	CLEAR_BIT(MCUCSR,6);
 	break;
 	}
 
@@ -39,110 +44,19 @@ void SwICU_SetCfgEdge(EN_SwICU_Edge_t a_en_inputCaptureEdgeedge)
 
 }
 void SwICU_Read(volatile uint8_t * a_pu8_capt)
-{//64 prescaler
-uint64_t num_of_tics=0;
-uint16_t num_of_cm=0;
-//num_of_cm=(68 * (*a_pu8_capt)/1000);
-num_of_tics=((* a_pu8_capt)+(u8_ovf_counter * RESOLUTION))/(58*16);
-num_of_cm=num_of_tics/30;
-
-//PORTB_DATA=(num_of_tics<<4);
-/*
-if (num_of_cm <15)
 {
-	PORTB_DATA=128;
-}else if (num_of_cm==0)
-{PORTB_DATA=0;
-}
-else if(num_of_cm >15 && num_of_cm <100){PORTB_DATA=255;}
-*/
-switch (num_of_tics) {
-	case 0:{
-	PORTB_DATA=0b00000000;
+	unsigned int  Num_of_Ticks=0;
+	float Num_of_mm=0;
+	float time=0.0;
+	float TICKTIME=(float)PRESCALER/(float)CPU;
+	Num_of_Ticks=((* a_pu8_capt)+(u32_ovf_counter * RESOLUTION));
+	time=(float)Num_of_Ticks*TICKTIME;
+	Num_of_mm=time/TIME_TAKEN_FOR_1_CM;
 	timer2Start();
 	timer2DelayMs(100);
-	break;}
-	case 1:{
-	PORTB_DATA=0b00010000;
-	timer2Start();
-	timer2DelayMs(100);
-	break;}
-	case 2:{
-	PORTB_DATA=0b00100000;
-	timer2Start();
-	timer2DelayMs(100);
-	break;}
-	case 3:{
-	PORTB_DATA=0b00110000;
-	timer2Start();
-	timer2DelayMs(100);
-	break;}
-	case 4:{
-	PORTB_DATA=0x40;
-	timer2Start();
-	timer2DelayMs(100);
-	break;}
-	case 5:{
-	PORTB_DATA=0x50;
-	timer2Start();
-	timer2DelayMs(100);
-	break;}
-	case 6:{
-	PORTB_DATA=0x60;
-	timer2Start();
-	timer2DelayMs(100);
-	break;}
-	case 7:{
-	PORTB_DATA=0x70;
-	timer2Start();
-	timer2DelayMs(100);
-	break;}
-	case 8:{
-	PORTB_DATA=0x80;
-	timer2Start();
-	timer2DelayMs(100);
-	break;}
-	case 9:{
-	timer2Start();
-	timer2DelayMs(100);
-	PORTB_DATA=0x90;
-	break;}
-	case 10:{
-	timer2Start();
-	timer2DelayMs(100);
-	PORTB_DATA=0xA0;
-	break;}
-	case 11:{
-	timer2Start();
-	timer2DelayMs(100);
-	PORTB_DATA=0x40;
-	break;}
-	case 12:{
-	timer2Start();
-	timer2DelayMs(100);
-	PORTB_DATA=0xC0;
-	break;}
-	case 13:{
-	timer2Start();
-	timer2DelayMs(100);
-	
-	PORTB_DATA=0xD0;
-	break;}
-	case 14:{
-	timer2Start();
-	timer2DelayMs(100);
-	
-	PORTB_DATA=0xE0;
-	break;}
-	case 15:{
-	timer2Start();
-	timer2DelayMs(100);
-	PORTB_DATA=0xF0;
-	break;}
-	default:
-	PORTB_DATA=0;
-	break;
-}
+	PORTB_DATA=((unsigned int)Num_of_mm<<4);
+timer2Start();
+timer2DelayMs(100);
 }
 
 
@@ -155,3 +69,12 @@ void SwICU_Start(void)
 {
 timer0Start();
 }
+EN_SwICU_Edge_t SwICU_GetCfgEdge(void)
+{
+	if (MCUCSR & 0x40)
+	{
+		return SwICU_EdgeRisiging;
+	}
+	else{return SwICU_EdgeFalling;}
+	
+}	

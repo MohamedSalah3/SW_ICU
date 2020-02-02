@@ -100,7 +100,13 @@
     <Compile Include="registers.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="softwareICU.c">
+    <Compile Include="softwareDelay.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="softwareDelay.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SOFTWAREICULAST.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="std_types.h">

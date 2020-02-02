@@ -11,7 +11,7 @@ uint8_t pooling_2=0;
 uint8_t Prescaler_Value2=0;
 uint8_t u8g_T1_Prescaler=0;
 volatile uint8_t pwm_time_on=0,flag=0;
-volatile uint8_t u8_ovf_counter=0;
+
 void timer0Init(En_timer0Mode_t en_mode,En_timer0OC_t en_OC0,En_timer0perscaler_t en_prescal,uint8_t u8_initialValue, uint8_t u8_outputCompare,En_timer0Interrupt_t en_interruptMask)
 {
 if(en_prescal == T0_NO_CLOCK)
@@ -135,7 +135,6 @@ for (u32_loop=0;u32_loop<u16_delay_in_ms;u32_loop++)
  */
  void timer0DelayUs(uint32_t u32_delay_in_us)
  {  uint32_t u32_loop=0;
-	u8_ovf_counter=0;
 	for (u32_loop=0;u32_loop<u32_delay_in_us;u32_loop++)
 	{
 	timer0Set(240);
@@ -180,28 +179,9 @@ break;
 
 }
 
-void timer0MakePulse(void)
-{
-timer0Init(T0_NORMAL_MODE,T0_OC0_DIS,T0_PRESCALER_NO,0,0,T0_POLLING);
-timer0SwPWM(80,0);//triger
-timer0Init(T0_NORMAL_MODE,T0_OC0_DIS,T0_PRESCALER_NO,0,0,T0_INTERRUPT_NORMAL);
-
-}
 
 
 
-void Timer_interrupt_routine(void)
-{/*
-	Led_Toggle(LED_3);
-	timer0Stop();
-*/
-u8_ovf_counter++;
-
-
-
-//timer0Read();
-//flag +=1;
-}
 
 void Timer_interrupt_COMP_routine(void)
 {

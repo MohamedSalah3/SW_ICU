@@ -162,11 +162,6 @@ void timer0SwPWM(uint8_t u8_dutyCycle,uint8_t u8_frequency);
 
 
 
-void timer0MakePulse(void);
-
-
-
-
 
 /*===========================Timer1 Control===============================*/
 /**

@@ -112,19 +112,3 @@ break;
 }
 }
 
-void check_button(void)
-{//	Led_Toggle(LED_0);
-  if(icu_started==1){
-	if(((MCUCSR>>6)&1))
-	{//reversed
-		SwICU_Start();
-		MCUCSR ^= (1<<6);
-	}
-	else
-	{
-		icu_started=0;
-		SwICU_Stop();
-		MCUCSR ^= (1<<6);
-	}
-}
-}
